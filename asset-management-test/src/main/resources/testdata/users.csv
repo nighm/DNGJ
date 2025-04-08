@@ -1,0 +1,7 @@
+username,password,role,expected_result
+super,admin123,admin,success
+testuser,wrongpass,user,failure
+wronguser,admin123,user,failure
+admin,password123,admin,success
+user1,user1pass,user,success
+user2,wrongpass,user,failure 

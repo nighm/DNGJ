@@ -1,0 +1,6 @@
+asset_name,ip_address,mac_address,status,group
+test-PC-1,192.168.24.121,C8:B4:AB:09:12:34,online,研发组
+test-PC-2,192.168.24.122,C8:B4:AB:09:12:35,online,测试组
+test-PC-3,192.168.24.123,C8:B4:AB:09:12:36,offline,运维组
+test-PC-4,192.168.24.124,C8:B4:AB:09:12:37,online,研发组
+test-PC-5,192.168.24.125,C8:B4:AB:09:12:38,offline,测试组 

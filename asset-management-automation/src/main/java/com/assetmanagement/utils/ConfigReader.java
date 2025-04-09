@@ -6,10 +6,17 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class ConfigReader {
+public class 
+
+
+
+ConfigReader {
     private static final Logger logger = LoggerFactory.getLogger(ConfigReader.class);
     private Properties properties;
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{([^}]+)\\}");
 
     public ConfigReader() {
         properties = new Properties();
@@ -22,48 +29,92 @@ public class ConfigReader {
         }
     }
 
+    public String getProperty(String key, String defaultValue) {
+        String value = properties.getProperty(key, defaultValue);
+        return resolveVariables(value);
+    }
+
+    private String resolveVariables(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        Matcher matcher = VARIABLE_PATTERN.matcher(value);
+        StringBuffer result = new StringBuffer();
+        
+        while (matcher.find()) {
+            String varName = matcher.group(1);
+            String replacement = properties.getProperty(varName);
+            
+            if (replacement == null) {
+                logger.warn("Variable ${" + varName + "} not found in properties");
+                replacement = matcher.group(0); // 保持原样
+            } else {
+                // 递归解析变量
+                replacement = resolveVariables(replacement);
+            }
+            
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        
+        matcher.appendTail(result);
+        return result.toString();
+    }
+
     public String getBrowserType() {
-        return "edge"; // 强制使用 Edge 浏览器
+        return getProperty("browser.type", "edge");
     }
 
     public boolean isHeadless() {
-        return Boolean.parseBoolean(properties.getProperty("browser.headless", "false"));
+        return Boolean.parseBoolean(getProperty("browser.headless", "false"));
     }
 
     public int getTimeout() {
-        return Integer.parseInt(properties.getProperty("browser.timeout", "10"));
+        return Integer.parseInt(getProperty("browser.timeout", "30"));
     }
 
     public String getBaseUrl() {
-        return properties.getProperty("base.url", "http://192.168.30.240");
+        return getProperty("base.url", "http://192.168.30.240");
     }
 
     public String getUsername() {
-        return properties.getProperty("admin.username", "super");
+        return getProperty("admin.username", "super");
     }
 
     public String getPassword() {
-        return properties.getProperty("admin.password", "admin123");
+        return getProperty("admin.password", "admin123");
     }
 
     public String getWebDriverPath(String browser) {
-        return properties.getProperty("webdriver." + browser + ".path");
+        return getProperty("webdriver." + browser + ".driver", "");
     }
 
     public String getLogLevel() {
-        return properties.getProperty("log.level", "INFO");
+        return getProperty("log.level", "INFO");
     }
 
     public String getLogFile() {
-        return properties.getProperty("log.file", "test.log");
+        return getProperty("log.file", "test.log");
     }
 
     public String getTestDataDir() {
-        return properties.getProperty("test.data.dir", "src/test/resources/testdata");
+        return getProperty("test.data.dir", "src/test/resources/testdata");
     }
 
     public String getLoginUrl() {
         String baseUrl = getBaseUrl();
-        return baseUrl + "/asset/assetOver";
+        return baseUrl + "/login";
+    }
+
+    public String getScreenshotDir() {
+        return getProperty("screenshot.dir", "logs/screenshots/");
+    }
+
+    public String getScreenshotFormat() {
+        return getProperty("screenshot.format", "png");
+    }
+
+    public boolean isScreenshotOnFailure() {
+        return Boolean.parseBoolean(getProperty("screenshot.on.failure", "true"));
     }
 } 

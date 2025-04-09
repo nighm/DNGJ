@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 public class BaseTest {
     protected WebDriver driver;
     protected ConfigReader config;
+    protected ScreenshotUtils screenshotUtils;
     private static final Logger logger = LoggerFactory.getLogger(BaseTest.class);
 
     @BeforeEach
@@ -37,6 +38,10 @@ public class BaseTest {
         driver = new EdgeDriver(edgeOptions);
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(timeout, java.util.concurrent.TimeUnit.SECONDS);
+        
+        // 初始化截图工具
+        screenshotUtils = new ScreenshotUtils(driver, config);
+        
         logger.info("Edge WebDriver initialized with SSL certificate handling");
     }
 
@@ -44,7 +49,7 @@ public class BaseTest {
     public void tearDown() {
         if (driver != null) {
             try {
-                ScreenshotUtils.takeScreenshot(driver, this.getClass().getSimpleName());
+                screenshotUtils.takeScreenshot(this.getClass().getSimpleName());
             } catch (Exception e) {
                 logger.error("Failed to take screenshot", e);
             }
@@ -54,6 +59,13 @@ public class BaseTest {
     }
 
     protected void takeScreenshotOnFailure(Throwable throwable) {
-        ScreenshotUtils.takeScreenshotOnFailure(driver, this.getClass().getSimpleName(), throwable);
+        try {
+            String prefix = String.format("%s_failure_%s",
+                this.getClass().getSimpleName(),
+                throwable.getClass().getSimpleName());
+            screenshotUtils.takeScreenshot(prefix);
+        } catch (Exception e) {
+            logger.error("Failed to take failure screenshot", e);
+        }
     }
 }

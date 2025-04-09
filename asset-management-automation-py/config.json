@@ -1,0 +1,16 @@
+{
+    "base_url": "http://localhost:8080",
+    "browser": "chrome",
+    "timeout": 10,
+    "headless": false,
+    "test_data": {
+        "admin": {
+            "username": "admin",
+            "password": "admin123"
+        },
+        "user": {
+            "username": "user",
+            "password": "user123"
+        }
+    }
+}

@@ -1,2 +1,0 @@
-username,password,role,expected_result
-super,admin123,admin,success 

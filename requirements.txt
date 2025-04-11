@@ -1,0 +1,7 @@
+selenium==4.16.0
+msedge-selenium-tools==3.141.4
+python-dotenv==1.0.0
+pillow==10.2.0
+easyocr==1.7.1
+psutil==5.9.8
+
